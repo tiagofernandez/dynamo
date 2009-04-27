@@ -1,0 +1,1 @@
+mvn archetype:create -DarchetypeGroupId=dynamo.archetypes -DarchetypeArtifactId=quickstart-web -DarchetypeVersion=0.4 -DgroupId=foo.bar -DartifactId=myapp

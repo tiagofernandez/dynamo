@@ -1,0 +1,22 @@
+<html>
+   <head>
+     <title>Celebrities</title>
+   </head>
+   <body>
+      <p><b>Celebrity List ($celebrityList.size())</b></p>
+      #set( $count = 1 )
+      <table>
+      	<!--# ifnotnull ($celebrityList) -->
+	        #foreach( $celebrity in $celebrityList )
+	          <tr>
+	            <td>$count)</td>
+	            <td>$celebrity.name</td>
+	            <td>$celebrity.city</td>
+	            <td>$celebrity.country</td>
+	          </tr>
+	          #set( $count = $count + 1 )
+	        #end
+        <!--# end -->
+      </table>
+   </body>
+</html>

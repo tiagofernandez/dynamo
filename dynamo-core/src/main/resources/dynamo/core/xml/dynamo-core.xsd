@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://tiagofernandez.blogspot.com/schema/core"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    targetNamespace="http://tiagofernandez.blogspot.com/schema/core"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://www.springframework.org/schema/beans" />
+
+	<xsd:element name="dataSource" type="dataSourceType" />
+	
+	<xsd:complexType name="dataSourceType">
+		<xsd:complexContent>
+			<xsd:extension base="beans:identifiedType">
+				<xsd:attribute name="jndiName" type="xsd:string" />
+				<xsd:attribute name="driverClassName" type="xsd:string" />
+				<xsd:attribute name="url" type="xsd:string" />
+				<xsd:attribute name="username" type="xsd:string" />
+				<xsd:attribute name="password" type="xsd:string" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="emailReceiver" type="emailReceiverType" />
+	
+	<xsd:complexType name="emailReceiverType">
+		<xsd:complexContent>
+			<xsd:extension base="beans:identifiedType">
+				<xsd:sequence>
+					<xsd:element ref="beans:property" />
+				</xsd:sequence>
+				<xsd:attribute name="pop" type="xsd:string" use="required" />
+				<xsd:attribute name="username" type="xsd:string" use="required" />
+				<xsd:attribute name="password" type="xsd:string" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="emailSender" type="emailSenderType" />
+	
+	<xsd:complexType name="emailSenderType">
+		<xsd:complexContent>
+			<xsd:extension base="beans:identifiedType">
+				<xsd:attribute name="smtp" type="xsd:string" use="required" />
+				<xsd:attribute name="username" type="xsd:string" />
+				<xsd:attribute name="password" type="xsd:string" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="entityManager" type="entityManagerType" />
+	
+	<xsd:complexType name="entityManagerType">
+		<xsd:complexContent>
+			<xsd:extension base="beans:identifiedType">
+				<xsd:attribute name="dataSourceRef" type="xsd:string" use="required" />
+				<xsd:attribute name="persistenceXmlLocation" type="xsd:string" />
+				<xsd:attribute name="dialect" type="xsd:string" use="required" />
+				<xsd:attribute name="hbm2ddl" type="xsd:string" use="required" />
+				<xsd:attribute name="showSql" type="xsd:string" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="profiler" type="profilerType" />
+	
+	<xsd:complexType name="profilerType">
+		<xsd:complexContent>
+			<xsd:extension base="beans:identifiedType" />
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="properties" type="propertiesType" />
+	
+	<xsd:complexType name="propertiesType">
+		<xsd:complexContent>
+			<xsd:extension base="beans:identifiedType">
+				<xsd:sequence>
+					<xsd:element ref="beans:property" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="service" type="serviceType" />
+	
+	<xsd:complexType name="serviceType">
+		<xsd:complexContent>
+			<xsd:extension base="beans:identifiedType">
+				<xsd:sequence minOccurs="0">
+					<xsd:element ref="beans:property" />
+				</xsd:sequence>
+				<xsd:attribute name="interface" type="xsd:string" use="required" />
+				<xsd:attribute name="target" type="xsd:string" use="required" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="transaction" type="transactionType" />
+	
+	<xsd:complexType name="transactionType">
+		<xsd:complexContent>
+			<xsd:extension base="beans:identifiedType">
+				<xsd:attribute name="entityManagerFactoryRef" type="xsd:string" use="required" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+</xsd:schema>

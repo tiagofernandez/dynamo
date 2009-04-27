@@ -1,0 +1,180 @@
+Service layer
+
+	A {{{http://www.javaworld.com/javaworld/jw-06-2005/jw-0613-soa.html}Service-Oriented Architecture (SOA)}} can be defined as 
+	a group of services, which communicate with each other. The process of communication involves either simple data passing 
+	or it could involve two or more services coordinating some activity. A service is a self-contained software module that 
+	performs a predetermined task, thus they are the building blocks of service-oriented applications. The services are somewhat 
+	analogous to Java objects and components such as EJBs. Unlike objects, services maintain their own state and provide a loosely 
+	coupled interface.
+	
+	In order to stick with best practices, each service is supposed to have its own contract:
+
++---
+public interface SecurityService extends Service {
+
+	...
+
+	/**
+	 * Lists users by role.
+	 * 
+	 * @param role the role type
+	 * @return the user list
+	 */
+	List<User> listUsersByRole(Role role);
+
+	/**
+	 * Performs login with username and password.
+	 * 
+	 * @param username the user name
+	 * @param password the password
+	 * @return the user object
+	 * @throws LoginException when the username and/or password are/is invalid
+	 */
+	User login(String username, String password) throws LoginException;
+
+	...
+
+	/**
+	 * Saves or updates a group.
+	 * 
+	 * @param group to persist
+	 * @return the saved group
+	 * @throws InvalidGroupException when the user object has invalid or missing data
+	 * @throws ExistingGroupNameException when attempting to save group with an existing name 
+	 */
+	Group saveGroup(Group group) throws InvalidGroupException, ExistingGroupNameException;
+
+}
++---
+
+	Notice this service extends directly from dynamo.core.service.Service interface. The concrete service
+	implementation is then responsible for containing the logic for addressing the business' needs. If there isn't any 
+	database involved in this process the concrete class doesn't need to do anything else, otherwise you'll have to:
+	
+	1. Add the annotation @Transactional to your concrete service class:
+
++---
+@Transactional(rollbackFor = { ServiceException.class })
+public final class SecurityServiceImpl implements SecurityService {
++---
+	
+	2. Include the following XML in your Spring configuration (by referencing your Entity Manager):
+
++---
+<core:transaction id="myTransaction"
+	entityManagerFactoryRef="myEntityManager" />
++---
+
+	3. Use the annotation @PersistenceContext to bind the service to the entity manager, then you can instantiate
+	your entity repositories which will probably inherit from dynamo.core.repository.AbstractRepository:
+	
++---
+@PersistenceContext(unitName = "admc")
+public void setAdmcEntityManager(EntityManager em) {
+	groupRepo = new GroupRepository(em);
+	userRepo = new UserRepository(em);
+}
++---
+	
+	Below an example of concrete implementation which extends from TransactionalService:
+	
++---
+@Transactional(rollbackFor = { ServiceException.class })
+public final class SecurityServiceImpl implements SecurityService {
+
+	...
+
+	private GroupRepository groupRepo;
+	private UserRepository userRepo;
+
+	...
+
+	/**
+	 * Sets the administration console entity manager.
+	 * 
+	 * @param em the entity manager to set
+	 */
+	@PersistenceContext(unitName = "admc")
+	public void setAdmcEntityManager(EntityManager em) {
+		groupRepo = new GroupRepository(em);
+		userRepo = new UserRepository(em);
+	}
+	
+	...
+	
+	/**
+	 * @see dynamo.admc.service.SecurityService#listUsersByRole(Role)
+	 */
+	public List<User> listUsersByRole(Role role) {
+		Assert.notNull(role, "Role must not be null");
+		logger.info("Listing Users [role=" + role + "]");
+		return userRepo.listByRole(role);
+	}
+	
+	/**
+	 * @see dynamo.admc.service.SecurityService#login(String, String)
+	 */
+	public User login(String username, String password) throws LoginException {
+		User user = getUserByUsername(username);
+		if (user == null || !user.checkPassword(password)) {
+			throw new LoginException("Invalid username and/or password");
+		}
+		return user;
+	}
+
+	/**
+	 * @see dynamo.admc.service.SecurityService#saveGroup(Group)
+	 */
+	@JpaEntityValidation(targets = { Group.class }, exception = InvalidGroupException.class)
+	public Group saveGroup(Group group) throws ExistingGroupNameException {
+		Assert.notNull(group, "Group must not be null");
+		
+		// Check whether the given group name is already being used
+		Group groupByName = getGroupByName(group.getName());
+		if (groupByName != null && !groupByName.getId().equals(group.getId())) {
+			throw new ExistingGroupNameException("Group name already being used: " + group.getName());
+		}
+		
+		// Handles create operation
+		if (group.getId() == null) {
+			logger.info("Saving Group [name=" + group.getName() + "]");
+			groupRepo.persistEntity(group);
+		}
+		// Handles update operation
+		else {
+			logger.info("Updating Group [name=" + group.getName() + "]");
+			groupRepo.mergeEntity(group);
+		}
+		
+		return group;
+	}
+
+	...
+	
+}
++---
+
+JPA entity validation
+
+	Have you noticed the annotation JpaEntityValidation in saveGroup() method? That's a feature provided by Dynamo 
+	component, which intends to perform automatic validation for JPA-like entities. This is achieved by allowing JpaEntityValidationInterceptor
+	to inspect the persistent fields and validating them according to what's expected. Let's take as example the Group class,
+	check its persistent fields:
+
++---
+	...
+	
+	@Column(unique = true, nullable = false, length = 30)
+	private String name;
+	
+	@Column(length = 200)
+	private String description;
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	private Set<User> users;
+	
+	...
++---
+	
+	Here the "name" field is not supposed to be null, hence if the method saveGroup() gets a Group object with a null name,
+	an InvalidGroupException will be raised. If no exception is defined, by default JpaEntityValidationException is used.

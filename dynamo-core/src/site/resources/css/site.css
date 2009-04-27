@@ -1,0 +1,11 @@
+﻿#banner {
+  height: 93px;
+  background: none;
+}
+#poweredBy img {
+  display: block;
+  margin: 20px 0 20px 17px;
+  border: 0px;
+  width: 74px;
+  height: 80px;
+}

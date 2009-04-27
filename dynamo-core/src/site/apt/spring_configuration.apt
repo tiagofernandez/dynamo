@@ -1,0 +1,143 @@
+Spring configuration
+
+	The {{{http://www.springframework.org/}Spring Framework}} defines itself as the leading full-stack Java/JEE application 
+	framework. Although it does not enforce any specific programming model, it has become popular in the Java community as an 
+	alternative, replacement, or even addition to the Enterprise JavaBean (EJB) model. By design, the framework offers a lot 
+	of freedom to Java developers yet provides well documented and easy-to-use solutions for common practices in the industry.
+
+Core namespace
+	
+	The Dynamo Core component creates a new XML namespace in order to simplify Spring configuration and embed additional
+	features to services and utilities APIs:
+	
++---
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:core="http://tiagofernandez.blogspot.com/schema/core"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://tiagofernandez.blogspot.com/schema/core http://tiagofernandez.blogspot.com/schema/core/dynamo-core.xsd"
+	default-autowire="byName">
++---
+
+	If you want all details about the provided configurations, check the XML schema definition file (dynamo-core.xsd).
+
+External properties
+
++---
+<!-- Externalizes specific properties -->
+<core:properties id="admcProperties">
+	<property name="locations">
+		<list>
+			<value>classpath:dynamo/admc/context/admc.properties</value>
+			<value>classpath:dynamo/admc/context/admc_test.properties</value>
+		</list>
+	</property>
+</core:properties>
++---
+
+	The core:properties element is responsible for telling Spring to consider some externalized properties (defined in 
+	the property files) before finishing processing  the whole XML. Therefore we can avoid hard-coding things like datasource 
+	settings into the configuration file. Notice the last file's properties override the previous ones, that's the reason we 
+	leave admc-core_test.properties for last, because it will be used for testing but not in production mode: the generated 
+	artifact (admc-x.y.jar) shall never have any xxx_test.properties file inside.
+
+Data source
+
++---
+<!-- Database connection settings -->
+<core:dataSource id="admcDataSource"
+	driverClassName="${dataSource.driverClassName}" 
+	url="${dataSource.url}" 
+	username="${dataSource.username}" 
+	password="${dataSource.password}" />
++---
+
+	The core:dataSource element is responsible for defining a datasource. Notice the placeholders ${xxx.yyy} for each property: 
+	they're all externalized by 'admcProperties' bean definition.
+
+Entity manager
+
++---
+<!-- Defines and customizes entity manager -->
+<core:entityManager id="admcEntityManager"
+	dataSourceRef="admcDataSource"
+	persistenceXmlLocation="classpath:META-INF/admc-persistence.xml"
+	dialect="${entityManager.dialect}" 
+	hbm2ddl="${entityManager.hbm2ddl}"
+	showSql="${entityManager.showSql}" />
++---
+
+	The core:entityManager element is responsible for initializing an EntityManager bound to the previously defined datasource. 
+	Therefore the persistence mechanism can be properly bound. More details on http://java.sun.com/javaee/5/docs/api/javax/persistence/EntityManager.html 
+	and http://www.hibernate.org/hib_docs/entitymanager/reference/en/html_single.
+
+Transaction
+
++---
+<!-- Enables transaction support -->
+<core:transaction id="admcTransaction"
+	entityManagerFactoryRef="admcEntityManager" />
++---
+
+	The core:transaction element is responsible for adding transactional capabilities to the previously defined EntityManager.
+	Hence, Spring will be aware of the @org.springframework.transaction.annotation.Transactional annotations we declare on the 
+	service classes.
+
+Profiling
+
++---
+<!-- Registers AOP profiler -->
+<core:profiler id="admcProfiler" />
+
+<!-- Sets basic profiling for all service methods -->
+<aop:config>
+	<aop:aspect ref="admcProfiler">
+		<aop:pointcut id="serviceMethods" expression="execution(* dynamo.admc.service.*.*(..))" />
+		<aop:around pointcut-ref="serviceMethods" method="profile" />
+	</aop:aspect>
+</aop:config>
++---
+
+	The core:profiler element is responsible for introducing profiling capabilities on any method we want (not required, but 
+	useful). Currently this profiler will only log method's response time with Log4J. In this case, we're telling Spring AOP 
+	we're targeting each service call on ADMC component.
+
+E-mail sender and receiver
+
++---
+<!-- E-mail receiver feature -->
+<core:emailReceiver id="admcEmailReceiver"
+	pop="${email.pop}"
+	username="${email.username}"
+	password="${email.password}">
+	<property name="listeners">
+		<list>
+			<bean class="dynamo.core.email.EmailReceiverClient" />
+		</list>
+	</property>
+</core:emailReceiver>
+
+<!-- E-mail sender feature -->
+<core:emailSender id="admcEmailSender"
+	smtp="${email.smtp}"
+	username="${email.username}"
+	password="${email.password}" />
++---
+
+	The core:emailSender and core:emailReceiver elements are only defined here as usage example. They allow us to easily 
+	declare an e-mail sender and receiver. The module benefiting from this feature should define these beans by itself when needed, 
+	since there is no point for the core platform doing it.
+
+Services
+
++---
+<!-- SecurityService definition -->
+<core:service id="securityService" 
+	interface="dynamo.admc.service.SecurityService"
+	target="dynamo.admc.service.SecurityServiceImpl" />
++---
+
+	The core:service element is responsible for publishing services as Spring beans, so here we just care about the service 
+	interface and concrete implementation. As additional feature, each issued service comes with dynamo.core.interceptor.JpaEntityValidationInterceptor
+	as attached interceptor.

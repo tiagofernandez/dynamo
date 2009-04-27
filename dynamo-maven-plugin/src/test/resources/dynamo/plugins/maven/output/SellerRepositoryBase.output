@@ -1,0 +1,99 @@
+package dynamo.modules.market.repository;
+
+import java.util.*;
+
+import javax.persistence.*;
+
+import dynamo.modules.market.entity.*;
+import dynamo.core.repository.AbstractRepository;
+
+/**
+ * Defines the Seller's repository.
+ */
+@SuppressWarnings("unchecked")
+public class SellerRepositoryBase
+			extends AbstractRepository {
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param em the entity manager
+	 */
+	public SellerRepositoryBase(EntityManager em) {
+		super(em);
+	}
+
+	/**
+	 * Gets Seller by id.
+	 * 
+	 * @param id the id
+	 * @return the Seller
+	 */
+	public Seller getById(Long id) {
+		Query q = em.createQuery(getByIdQuery().toString());
+		q.setParameter("id", id);
+		return (Seller) getSingleResult(q);
+	}
+
+	/**
+	 * Gets Seller by name.
+	 * 
+	 * @param name the name
+	 * @return the Seller
+	 */
+	public Seller getByName(String name) {
+		Query q = em.createQuery(getByNameQuery().toString());
+		q.setParameter("name", name);
+		return (Seller) getSingleResult(q);
+	}
+	
+	/**
+	 * Lists Seller.
+	 * 
+	 * @return the Seller list
+	 */
+	public List<Seller> list() {
+		Query q = em.createQuery(getListQuery().toString());
+		return (List<Seller>) getResultList(q);
+	}
+	
+	/**
+	 * Gets the query used for getting Seller by id.
+	 * 
+	 * @return the Seller by id query string
+	 */
+	protected StringBuilder getByIdQuery() {
+		StringBuilder query = new StringBuilder("select x from Seller x");
+		query.append(" where x.id=:id");
+		return query;
+	}
+
+	/**
+	 * Gets the query used for getting Seller by name.
+	 * 
+	 * @return the Seller by name query string
+	 */
+	protected StringBuilder getByNameQuery() {
+		StringBuilder query = new StringBuilder("select x from Seller x");
+		query.append(" where x.name=:name");
+		return query;
+	}
+	
+	/**
+	 * Gets the query used for listing Seller.
+	 * 
+	 * @return the Seller query string
+	 */
+	protected StringBuilder getListQuery() {
+		return new StringBuilder("select x from Seller x");
+	}
+
+	/**
+	 * @see dynamo.core.repository.AbstractRepository#getTargetEntity()
+	 */
+	@Override
+	protected Class<?> getTargetEntity() {
+		return Seller.class;
+	}
+
+}

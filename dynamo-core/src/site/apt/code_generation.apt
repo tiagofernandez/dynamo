@@ -1,0 +1,112 @@
+Code generation
+
+	Once you've created a new project by hand or using Dynamo Quickstart Web archetype, you can start benefiting from code generation
+	facilities. Thus you'll avoid 'copy & paste' kind of coding, and will prevent lots of silly mistakes like invalid equals/hashCode 
+	methods and boring tasks like writing basic finder methods in your repositories. Ok, the first step for enabling code generation 
+	into your project is to include Dynamo-Maven-Plugin to your project:
+	
++---
+<plugin>
+  <groupId>dynamo.plugins</groupId>
+  <artifactId>dynamo-maven-plugin</artifactId>
+  <version>0.3</version>
+  <executions>
+    <execution>
+      <phase>generate-sources</phase>
+      <goals>
+        <goal>codegen</goal>
+      </goals>
+    </execution>
+  </executions>
+</plugin>
++---
+
+	Then you write your DSL into /src/dynamo/application.dsl file, something like:
+	
++---
+Application Admc {
+
+	Entity User {
+		[@Column(unique = true, nullable = false, length = 30)]
+		String username
+	
+		[@Column(nullable = false, length = 100)]
+		String password
+	
+		[@Column(nullable = false, length = 50)]
+		String name
+	
+		[@Column(unique = true, nullable = false, length = 50)]
+		String email
+	
+		[@Basic(optional = false) @Enumerated(EnumType.STRING)]
+		Role role
+	
+		[@ManyToMany(fetch = FetchType.LAZY)]
+		Set<Group> groups
+	}
+	
+	Entity Group {
+		[@Column(unique = true, nullable = false, length = 30)]
+		String name
+		
+		[@Column(length = 200)]
+		String description
+	
+		[@ManyToMany(fetch = FetchType.LAZY)]
+		Set<User> users
+	}
+	
+}
++---
+
+	Notice you don't have to put ID and VERSION fields into your DSL, Dynamo will take care of them for you. From now on you'll get 
+	base entities and repositories each time you build your project:
+	
++---
+$ mvn clean install -o
+[INFO] NOTE: Maven is executing in offline mode. Any artifacts not already in your local repository will be inaccessible.
+[INFO] Scanning for projects...
+[INFO] Reactor build order:
+[INFO]   Dynamo Modules
+[INFO]   Dynamo Administration Console
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Dynamo Modules
+[INFO]    task-segment: [clean, install]
+[INFO] ------------------------------------------------------------------------
+[INFO] [clean:clean]
+[INFO] [cobertura:clean {execution: default}]
+[INFO] [site:attach-descriptor]
+[INFO] [install:install]
+[INFO] Installing ...\modules\pom.xml to \Repository\dynamo\modules\1.0\modules-1.0.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Dynamo Administration Console
+[INFO]    task-segment: [clean, install]
+[INFO] ------------------------------------------------------------------------
+[INFO] [clean:clean]
+[INFO] Deleting directory ...\modules\admc\target
+[INFO] [cobertura:clean {execution: default}]
+[INFO] [dynamo:codegen {execution: default}]
+[INFO] Started generating code using Dynamo-Maven-Plugin...
+[INFO] Read ...\modules\admc/src/dynamo/application.dsl file, lenght = 634
+[INFO] Wrote ...\modules\admc/src/main/java/dynamo/admc/entity/UserBase.java file, lenght = 3123
+[INFO] Wrote ...\modules\admc/src/main/java/dynamo/admc/repository/UserRepositoryBase.java file, lenght = 2820
+[INFO] Wrote ...\modules\admc/src/main/java/dynamo/admc/entity/GroupBase.java file, lenght = 2173
+[INFO] Wrote ...\modules\admc/src/main/java/dynamo/admc/repository/GroupRepositoryBase.java file, lenght = 2208
+[INFO] Code generation completed!
+...
++---
+
+	Here we've generated 4 classes: UserBase, UserRepositoryBase, GroupBase and GroupRepositoryBase. DON'T put them under version
+	control (SVN/CVS), remember each time you build your module you'll get a fresh generated file, so put them into ignore list instead. After 
+	going through this process, you can get back to the real work by subclassing the generated entities and repositories:
+	
++---
+@Entity
+@Table(name = "GROUP")
+public class Group extends GroupBase {
+
+...and...
+
+public class GroupRepository extends GroupRepositoryBase {
++---

@@ -1,0 +1,125 @@
+Quickstart
+
+	The faster way to set up a new project it to use the {{{http://sourceforge.net/project/showfiles.php?group_id=214850&package_id=259081&release_id=625481}
+	Dynamo Quickstart Web}} archetype. Download the RAR file and unpack it into your Maven repository. From now on you can create your
+	project, so go to the path you want to keep it and run the Maven command bellow:
+	
++---
+mvn archetype:create 
+  -DarchetypeGroupId=dynamo.archetypes
+  -DarchetypeArtifactId=quickstart-web 
+  -DarchetypeVersion=0.2 
+  -DgroupId=dynamo
+  -DartifactId=myapp
++---
+
+	Afterwards you'll end up having the folder "myapp" with the following structure:
+	
++---
+myapp
+|-- .checkstyle
+|-- .classpath
+|-- .pmd
+|-- .project
+|-- .ruleset
+|-- pom.xml
+`-- .settings
+  |-- org.eclipse.jdt.core.prefs
+  |-- org.eclipse.jdt.ui.prefs
+`-- etc
+  `-- test
+    |-- app-tests.xml
+`-- src
+  `-- changes
+    |-- changes.xml
+  `-- main
+    `-- java
+      `-- dynamo
+        |-- AppContext.java
+    `-- resources
+      |-- app.properties
+      |-- app-context.xml
+      `-- META-INF
+        |-- persistence.xml
+    `-- webapp
+      `-- WEB-INF
+        |-- web.xml
+  `-- test
+    `-- java
+      `-- dynamo
+        |-- AppContextTest.java
+    `-- resources
+      |-- app_test.properties
++---
+
+	The next step is to make sure all libraries are properly installed in your Maven repository, so open a command prompt 
+	and run a simple "mvn package" command. Some resources will be downloaded and you'll have a successful build:
+	
++---
+
+$ mvn package
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Building myapp
+[INFO]    task-segment: [package]
+[INFO] ------------------------------------------------------------------------
+[INFO] [resources:resources]
+[INFO] Using default encoding to copy filtered resources.
+Downloading: http://repo1.maven.org/maven2/com/sun/xml/bind/jaxb-impl/2.0.5/jaxb-impl-2.0.5.pom
+Downloading: http://repo1.maven.org/maven2/javax/mail/mailapi/1.4/mailapi-1.4.pom
+Downloading: http://repo1.maven.org/maven2/javax/mail/pop3/1.4/pop3-1.4.pom
+Downloading: http://repo1.maven.org/maven2/javax/mail/smtp/1.4/smtp-1.4.pom
+Downloading: http://repo1.maven.org/maven2/javax/persistence/ejb/3.0/ejb-3.0.pom
+Downloading: http://repo1.maven.org/maven2/hsqldb/hsqldbmain/1.8.0.7/hsqldbmain-1.8.0.7.pom
+Downloading: http://repo1.maven.org/maven2/hsqldb/hsqljdbc/1.8.0.7/hsqljdbc-1.8.0.7.pom
+Downloading: http://repo1.maven.org/maven2/icu4j/icu4j/3.8.1/icu4j-3.8.1.pom
+Downloading: http://repo1.maven.org/maven2/org/apache/cxf/cxf/2.0.5-incubator/cxf-2.0.5-incubator.pom
+Downloading: http://repo1.maven.org/maven2/org/hibernate/hibernate-annotations/3.3.1.ga/hibernate-annotations-3.3.1.ga.pom
+Downloading: http://repo1.maven.org/maven2/org/hibernate/hibernate-commons-annotations/3.3.1.ga/hibernate-commons-annotations-3.3.1.ga.pom
+Downloading: http://repo1.maven.org/maven2/org/hibernate/hibernate-entitymanager/3.3.2.ga/hibernate-entitymanager-3.3.2.ga.pom
+Downloading: http://repo1.maven.org/maven2/org/testng/testng/5.7-jdk15/testng-5.7-jdk15.pom
+[INFO] [compiler:compile]
+[INFO] Compiling 1 source file to ...\others\myapp\target\classes
+[INFO] [resources:testResources]
+[INFO] Using default encoding to copy filtered resources.
+[INFO] [compiler:testCompile]
+[INFO] Compiling 1 source file to ...\others\myapp\target\test-classes
+[INFO] [surefire:test]
+[INFO] Surefire report directory: ...\others\myapp\target\surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running TestSuite
+[Parser] Running:
+  Command line suite
+
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.947 sec
+
+Results :
+
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] [war:war]
+[INFO] Packaging webapp
+[INFO] Assembling webapp[myapp] in [...\others\myapp\target\myapp]
+[INFO] Processing war project
+[INFO] Webapp assembled in[1620 msecs]
+[INFO] Building war: ...\others\myapp\target\myapp.war
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 20 seconds
+[INFO] Finished at: Sun Sep 21 15:45:02 CEST 2008
+[INFO] Final Memory: 12M/24M
+[INFO] ------------------------------------------------------------------------
+
++---
+
+	Now it's just a matter of starting developing the project using your favorite IDE, like Eclipse for example. The first 
+	thing to do is to make sure you have a M2_REPO variable pointing to your Maven repository. Go to Window > Preference > 
+	Java > Build Path > Classpath Variables and click on the New button. In the Name text box type M2_REPO and in the Path
+	put the path to your Maven repository. Then go to File > Import > Existing Projects into Workspace. Select your project's 
+	root directory and click on the Finish button.
+	
+	That's it, at this point you have your new project all set! Good programming ;)

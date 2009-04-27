@@ -1,0 +1,81 @@
+package $entity.application.getPackageName(".repository");
+
+import java.util.*;
+
+import javax.persistence.*;
+
+import $entity.application.getPackageName(".entity.*");
+import dynamo.core.repository.AbstractRepository;
+
+/**
+ * Defines the $entity.getName()'s repository.
+ */
+@SuppressWarnings("unchecked")
+public class $entity.getName()RepositoryBase
+			extends AbstractRepository {
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param em the entity manager
+	 */
+	public $entity.getName()RepositoryBase(EntityManager em) {
+		super(em);
+	}
+
+#set ($attrUniqueNames = $entity.getAttributeUniqueNames())
+#foreach ($attr in $attrUniqueNames)
+	/**
+	 * Gets $entity.getName() by $attr.
+	 * 
+	 * @param $attr the $attr
+	 * @return the $entity.getName()
+	 */
+	public $entity.getName() getBy$entity.getFirstCaseUpper($attr)($entity.getType($attr) $attr) {
+		Query q = em.createQuery(getBy$entity.getFirstCaseUpper($attr)Query().toString());
+		q.setParameter("$attr", $attr);
+		return ($entity.getName()) getSingleResult(q);
+	}
+
+#end
+	/**
+	 * Lists $entity.getName().
+	 * 
+	 * @return the $entity.getName() list
+	 */
+	public List<$entity.getName()> list() {
+		Query q = em.createQuery(getListQuery().toString());
+		return (List<$entity.getName()>) getResultList(q);
+	}
+	
+#foreach ($attr in $attrUniqueNames)
+	/**
+	 * Gets the query used for getting $entity.getName() by $attr.
+	 * 
+	 * @return the $entity.getName() by $attr query string
+	 */
+	protected StringBuilder getBy$entity.getFirstCaseUpper($attr)Query() {
+		StringBuilder query = new StringBuilder("select x from $entity.getName() x");
+		query.append(" where x.$attr=:$attr");
+		return query;
+	}
+
+#end
+	/**
+	 * Gets the query used for listing $entity.getName().
+	 * 
+	 * @return the $entity.getName() query string
+	 */
+	protected StringBuilder getListQuery() {
+		return new StringBuilder("select x from $entity.getName() x");
+	}
+
+	/**
+	 * @see dynamo.core.repository.AbstractRepository#getTargetEntity()
+	 */
+	@Override
+	protected Class<?> getTargetEntity() {
+		return $entity.getNameAndAppendSuffix(".class");
+	}
+
+}

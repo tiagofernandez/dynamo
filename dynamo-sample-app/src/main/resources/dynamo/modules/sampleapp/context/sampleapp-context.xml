@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:simple="http://cxf.apache.org/simple" 
+	xmlns:core="http://tiagofernandez.blogspot.com/schema/core"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd
+		http://tiagofernandez.blogspot.com/schema/core http://tiagofernandez.blogspot.com/schema/core/dynamo-core.xsd"
+	default-autowire="byName">
+
+	<!-- See: http://cwiki.apache.org/CXF20DOC/simple-frontend-configuration.html -->
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+
+	<!-- Externalizes specific properties -->
+	<core:properties id="sampleappProperties">
+		<property name="locations">
+			<list>
+				<value>classpath:dynamo/modules/sampleapp/context/sampleapp.properties</value>
+				<value>classpath:dynamo/modules/sampleapp/context/sampleapp_test.properties</value>
+			</list>
+		</property>
+	</core:properties>
+
+	<!-- Database connection settings -->
+	<core:dataSource id="sampleappDataSource"
+		driverClassName="${dataSource.driverClassName}" 
+		url="${dataSource.url}" 
+		username="${dataSource.username}" 
+		password="${dataSource.password}" />
+
+	<!-- Defines and customizes entity manager -->
+	<core:entityManager id="sampleappEntityManager"
+		dataSourceRef="sampleappDataSource"
+		persistenceXmlLocation="classpath:META-INF/sampleapp-persistence.xml"
+		dialect="${entityManager.dialect}" 
+		hbm2ddl="${entityManager.hbm2ddl}"
+		showSql="${entityManager.showSql}" />
+	
+	<!-- Enables transaction support -->
+	<core:transaction id="sampleappTransaction"
+		entityManagerFactoryRef="sampleappEntityManager" />
+	
+	<!-- Registers AOP profiler -->
+	<core:profiler id="sampleappProfiler" />
+	
+	<!-- Sets basic profiling for all service methods -->
+    <aop:config>
+        <aop:aspect ref="sampleappProfiler">
+            <aop:pointcut id="serviceMethods" expression="execution(* dynamo.modules.sampleapp.service.*.*(..))" />
+            <aop:around pointcut-ref="serviceMethods" method="profile" />
+        </aop:aspect>
+    </aop:config>
+    
+    <!-- E-mail receiver feature -->
+    <!--core:emailReceiver id="sampleappEmailReceiver"
+    	pop="${email.pop}"
+    	username="${email.username}"
+    	password="${email.password}">
+		<property name="listeners">
+			<list>
+				<bean class="dynamo.core.email.EmailReceiverClient" />
+			</list>
+		</property>
+    </core:emailReceiver-->
+    	
+    <!-- E-mail sender feature -->
+    <!--core:emailSender id="sampleappEmailSender"
+    	smtp="${email.smtp}"
+    	username="${email.username}"
+    	password="${email.password}" /-->
+	
+	<!-- SecurityService definition -->
+	<core:service id="securityService" 
+		interface="dynamo.modules.sampleapp.service.SecurityService"
+		target="dynamo.modules.sampleapp.service.SecurityServiceImpl" />
+
+	<!-- Publishes security web-service -->
+	<simple:server id="securityWebService" 
+		serviceClass="dynamo.modules.sampleapp.service.SecurityService"
+		serviceBean="#securityService" 
+		address="/SecurityService" />
+
+	<!-- Registers security web-service client -->
+	<simple:client id="securityWebServiceClient" 
+		serviceClass="dynamo.modules.sampleapp.service.SecurityService"
+		address="http://${webServer.host}:${webServer.port}/${webServer.context}/services/SecurityService" />    
+
+</beans>

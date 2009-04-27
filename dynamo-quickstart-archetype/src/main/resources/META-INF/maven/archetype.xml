@@ -1,0 +1,18 @@
+<archetype>
+	<id>quickstart</id>
+	<resources>
+		<resource>etc/test/app-tests.xml</resource>
+		<resource>src/changes/changes.xml</resource>
+		<resource>src/main/resources/app-context.xml</resource>
+		<resource>src/main/resources/app.properties</resource>	
+		<resource>src/main/resources/META-INF/persistence.xml</resource>
+		<resource>src/main/webapp/WEB-INF/web.xml</resource>
+		<resource>src/test/resources/app_test.properties</resource>
+	</resources>
+	<sources>
+		<source>src/main/java/AppContext.java</source>
+	</sources>
+	<testSources>
+		<source>src/test/java/AppContextTest.java</source>
+	</testSources>
+</archetype>

@@ -1,0 +1,99 @@
+package dynamo.modules.market.repository;
+
+import java.util.*;
+
+import javax.persistence.*;
+
+import dynamo.modules.market.entity.*;
+import dynamo.core.repository.AbstractRepository;
+
+/**
+ * Defines the Buyer's repository.
+ */
+@SuppressWarnings("unchecked")
+public class BuyerRepositoryBase
+			extends AbstractRepository {
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param em the entity manager
+	 */
+	public BuyerRepositoryBase(EntityManager em) {
+		super(em);
+	}
+
+	/**
+	 * Gets Buyer by id.
+	 * 
+	 * @param id the id
+	 * @return the Buyer
+	 */
+	public Buyer getById(Long id) {
+		Query q = em.createQuery(getByIdQuery().toString());
+		q.setParameter("id", id);
+		return (Buyer) getSingleResult(q);
+	}
+
+	/**
+	 * Gets Buyer by name.
+	 * 
+	 * @param name the name
+	 * @return the Buyer
+	 */
+	public Buyer getByName(String name) {
+		Query q = em.createQuery(getByNameQuery().toString());
+		q.setParameter("name", name);
+		return (Buyer) getSingleResult(q);
+	}
+	
+	/**
+	 * Lists Buyer.
+	 * 
+	 * @return the Buyer list
+	 */
+	public List<Buyer> list() {
+		Query q = em.createQuery(getListQuery().toString());
+		return (List<Buyer>) getResultList(q);
+	}
+	
+	/**
+	 * Gets the query used for getting Buyer by id.
+	 * 
+	 * @return the Buyer by id query string
+	 */
+	protected StringBuilder getByIdQuery() {
+		StringBuilder query = new StringBuilder("select x from Buyer x");
+		query.append(" where x.id=:id");
+		return query;
+	}
+
+	/**
+	 * Gets the query used for getting Buyer by name.
+	 * 
+	 * @return the Buyer by name query string
+	 */
+	protected StringBuilder getByNameQuery() {
+		StringBuilder query = new StringBuilder("select x from Buyer x");
+		query.append(" where x.name=:name");
+		return query;
+	}
+	
+	/**
+	 * Gets the query used for listing Buyer.
+	 * 
+	 * @return the Buyer query string
+	 */
+	protected StringBuilder getListQuery() {
+		return new StringBuilder("select x from Buyer x");
+	}
+
+	/**
+	 * @see dynamo.core.repository.AbstractRepository#getTargetEntity()
+	 */
+	@Override
+	protected Class<?> getTargetEntity() {
+		return Buyer.class;
+	}
+
+}

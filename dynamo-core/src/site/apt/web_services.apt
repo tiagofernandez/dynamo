@@ -1,0 +1,28 @@
+Web services
+
+	The term Web Services describes a standardized way of integrating Web-based applications using the XML, SOAP, WSDL and UDDI 
+	open standards over an internet protocol backbone. XML is used to tag the data, SOAP is used to transfer the data, WSDL is 
+	used for describing the services available and UDDI is used for listing what services are available.
+	
+	The suggested way for exposing Spring service beans as Web Service is to use {{{http://cxf.apache.org/}Apache CXF}}, since it 
+	helps you build and develop services using frontend programming APIs, like JAX-WS. These services can speak a variety of protocols 
+	such as SOAP, XML/HTTP, RESTful HTTP, or CORBA and work over a variety of transports such as HTTP, JMS or JBI.
+	
+	Publishing Web Services with CXF is just a matter of including additional XML into Spring configuration:
+	
++---
+<!-- Publishes security web-service -->
+<simple:server id="securityWebService" 
+	serviceClass="dynamo.admc.service.SecurityService"
+	serviceBean="#securityService" 
+	address="/SecurityService" />
++---
+
+	In other hand if you need to allow your client to reach a deployed WS, you can do it like this:
+	
++---
+<!-- Registers security web-service client -->
+<simple:client id="securityWebServiceClient" 
+	serviceClass="dynamo.admc.service.SecurityService"
+	address="http://${webServer.host}:${webServer.port}/${webServer.context}/services/SecurityService" />    
++---

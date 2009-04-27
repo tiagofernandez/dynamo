@@ -1,0 +1,71 @@
+package $entity.application.getPackageName(".entity");
+
+import java.util.*;
+
+import javax.persistence.*;
+
+import org.apache.commons.lang.builder.*;
+import org.hibernate.validator.*;
+
+/**
+ * $entity.getName()Base object.
+ */
+@MappedSuperclass
+public class $entity.getName()Base {
+
+#set ($attrNames = $entity.getAttributeNames())
+#foreach ($attr in $attrNames)
+	$entity.getAnnotation($attr)
+	protected $entity.getType($attr) $attr;
+
+#end
+#foreach ($attr in $attrNames)
+#set ($attrType = $entity.getType($attr))
+#set ($attrFirstCaseUpper = $entity.getFirstCaseUpper($attr))
+	/**
+	 * @return the $attr
+	 */
+	public $attrType get$attrFirstCaseUpper() {
+		return $attr;
+	}
+
+	/**
+	 * @param $attr the $attr to set
+	 */
+	public void set$attrFirstCaseUpper($attrType $attr) {
+		this.$attr = $attr;
+	}
+
+#end
+#set ($attrUniqueNames = $entity.getAttributeUniqueNames())
+	/**
+	 * @see java.lang.Object#equals(Object)
+	 */
+	@Override
+	public boolean equals(Object other) {
+		boolean equals = false;
+		if (other instanceof $entity.getName()) {
+			$entity.getName() castOther = ($entity.getName()) other;
+			equals = new EqualsBuilder()
+#foreach ($attr in $attrUniqueNames)
+#set ($attrFirstCaseUpper = $entity.getFirstCaseUpper($attr))
+				.append(this.get$attrFirstCaseUpper(), castOther.get$attrFirstCaseUpper())
+#end
+				.isEquals();
+		}
+		return equals;
+	}
+
+	/**
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder()
+#foreach ($attr in $attrUniqueNames)
+			.append(get$entity.getFirstCaseUpper($attr)())
+#end
+			.toHashCode();
+	}
+	
+}

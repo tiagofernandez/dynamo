@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Dynamo">
+
+	<bannerLeft>
+		<name>Dynamo</name>
+		<src>/images/dynamo_logo.png</src>
+	</bannerLeft>
+
+	<bannerRight>
+		<name>SourceForge.net</name>
+		<src>http://sflogo.sourceforge.net/sflogo.php?group_id=158027&amp;type=2</src>
+		<href>http://sourceforge.net</href>
+	</bannerRight>
+
+	<skin>
+		<groupId>org.apache.maven.skins</groupId>
+		<artifactId>maven-stylus-skin</artifactId>
+		<version>1.0.1</version>
+	</skin>  
+
+	<body>
+
+		<links>
+			<item name="Dynamo" href="http://github.com/tiagofernandez/dynamo/tree/master"/>
+			<item name="Wiki" href="http://wiki.github.com/tiagofernandez/dynamo" />
+		</links>
+
+		<menu name="${project.name}">
+			<item name="Introduction" href="index.html"/>
+		</menu>
+
+		<menu name="Help">
+			<item name="FAQ" href="faq.html"/>
+		</menu>
+
+		<menu name="Tutorial">
+			<item name="Quickstart" href="quickstart.html" />
+			<item name="Code generation" href="code_generation.html" />
+		</menu>
+		
+		<menu name="Framework">
+			<item name="Entity model" href="entity_model.html" />
+			<item name="Service layer" href="service_layer.html" />
+			<item name="Spring configuration" href="spring_configuration.html" />
+			<item name="Web services" href="web_services.html" />
+		</menu>
+
+		<menu ref="reports" />
+
+	</body>
+
+	<!--poweredBy>
+		<logo name="Dynamo" href="http://github.com/tiagofernandez/dynamo/tree/master" img="/images/dynamo.png"/>
+	</poweredBy-->
+
+</project>

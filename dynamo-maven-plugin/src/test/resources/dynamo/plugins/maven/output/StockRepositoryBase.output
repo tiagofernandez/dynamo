@@ -1,0 +1,99 @@
+package dynamo.modules.market.repository;
+
+import java.util.*;
+
+import javax.persistence.*;
+
+import dynamo.modules.market.entity.*;
+import dynamo.core.repository.AbstractRepository;
+
+/**
+ * Defines the Stock's repository.
+ */
+@SuppressWarnings("unchecked")
+public class StockRepositoryBase
+			extends AbstractRepository {
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param em the entity manager
+	 */
+	public StockRepositoryBase(EntityManager em) {
+		super(em);
+	}
+
+	/**
+	 * Gets Stock by id.
+	 * 
+	 * @param id the id
+	 * @return the Stock
+	 */
+	public Stock getById(Long id) {
+		Query q = em.createQuery(getByIdQuery().toString());
+		q.setParameter("id", id);
+		return (Stock) getSingleResult(q);
+	}
+
+	/**
+	 * Gets Stock by code.
+	 * 
+	 * @param code the code
+	 * @return the Stock
+	 */
+	public Stock getByCode(String code) {
+		Query q = em.createQuery(getByCodeQuery().toString());
+		q.setParameter("code", code);
+		return (Stock) getSingleResult(q);
+	}
+	
+	/**
+	 * Lists Stock.
+	 * 
+	 * @return the Stock list
+	 */
+	public List<Stock> list() {
+		Query q = em.createQuery(getListQuery().toString());
+		return (List<Stock>) getResultList(q);
+	}
+	
+	/**
+	 * Gets the query used for getting Stock by id.
+	 * 
+	 * @return the Stock by id query string
+	 */
+	protected StringBuilder getByIdQuery() {
+		StringBuilder query = new StringBuilder("select x from Stock x");
+		query.append(" where x.id=:id");
+		return query;
+	}
+
+	/**
+	 * Gets the query used for getting Stock by code.
+	 * 
+	 * @return the Stock by code query string
+	 */
+	protected StringBuilder getByCodeQuery() {
+		StringBuilder query = new StringBuilder("select x from Stock x");
+		query.append(" where x.code=:code");
+		return query;
+	}
+	
+	/**
+	 * Gets the query used for listing Stock.
+	 * 
+	 * @return the Stock query string
+	 */
+	protected StringBuilder getListQuery() {
+		return new StringBuilder("select x from Stock x");
+	}
+
+	/**
+	 * @see dynamo.core.repository.AbstractRepository#getTargetEntity()
+	 */
+	@Override
+	protected Class<?> getTargetEntity() {
+		return Stock.class;
+	}
+
+}

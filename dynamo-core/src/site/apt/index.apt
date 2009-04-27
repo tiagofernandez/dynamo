@@ -1,0 +1,81 @@
+What's Dynamo?
+
+	Imagine you want to start a new Java-based project: you have plenty of frameworks to choose and to integrate before 
+	start focusing on the business logic, when it should be exactly the opposite. Then you loose a lot of time creating 
+	the project structure, thinking about infrastructure, handling compatibility issues, building, reporting and everything
+	else, when actually you should think about what the client really wants and deliver a solution quickly!
+	
+	Today most of the solutions we developers provide are pretty much the same in terms of technical choices, so why start
+	from ground zero every time? We should maximize the reuse of components, so the Dynamo aims to do the
+	hard work for you and help you to deliver a reliable and scalable solution to end user without headaches.
+
+Why should you try it?
+
+	[[*]] You need a solid starting point for you new project.
+	
+	[[*]] You rather reuse code and stick with stardards instead of building your solution from scratch.
+	
+	[[*]] Your backoffice solution is supposed to be services-oriented.
+	
+	[[*]] You don't want to spend time with the persistence layer or utilities APIs.
+	
+	[[*]] You have your mind open to domain-driven design and test-driven development.
+	
+	[[*]] You want to avoid cumbersome configurations as much as possible!
+
+Getting the idea
+
+	Take a look at the following Spring configuration:
+
++---
+<core:service id="securityService" 
+	interface="dynamo.admc.service.SecurityService"
+	target="dynamo.admc.service.SecurityServiceImpl" />
++---
+
+	That's all you need to do in order to declare a business service. In the backwards you're service is just a POJO which
+	inherits from dynamo.core.service.AbstractDatabaseService. If you want it to be transactional, it's just a
+	matter of extending from dynamo.core.service.TransactionalService and declaring the Spring XML below:
+	
++---
+<core:transaction id="admcTransaction"
+	entityManagerFactoryRef="admcEntityManager" />
++---
+
+	Of course if you need a transactional service it means you need a database layer set. This is easily done by mixing	Spring 
+	configuration to Entity Manager:
+
++---
+<core:entityManager id="admcEntityManager"
+	dataSourceRef="admcDataSource"
+	persistenceXmlLocation="classpath:META-INF/admc-persistence.xml"
+	dialect="${entityManager.dialect}" 
+	hbm2ddl="${entityManager.hbm2ddl}"
+	showSql="${entityManager.showSql}" />
++---
+
+	Therefore the data source would be simply declared like this:
+
++---
+<core:dataSource id="admcDataSource"
+	driverClassName="${dataSource.driverClassName}" 
+	url="${dataSource.url}" 
+	username="${dataSource.username}" 
+	password="${dataSource.password}" />
++---
+
+	At this point you might be asking yourself about all these placeholders. That's just a matter of externalizing them
+	within regular properties files. For this purpose, just use the following XML:
+	
++---
+<core:properties id="admcProperties">
+	<property name="locations">
+		<list>
+			<value>classpath:dynamo/admc/context/admc.properties</value>
+		</list>
+	</property>
+</core:properties>
++---
+
+	That's it, from now on you don't need to think about concrete classes for infrastructe components anymore. Instead you 
+	simply focus on what's really important: the business logic!

@@ -1,0 +1,128 @@
+package dynamo.modules.market.entity;
+
+import java.util.*;
+
+import javax.persistence.*;
+
+import org.apache.commons.lang.builder.*;
+import org.hibernate.validator.*;
+
+/**
+ * StockBase object.
+ */
+@MappedSuperclass
+public class StockBase {
+
+	@javax.persistence.Id @javax.persistence.GeneratedValue(strategy = GenerationType.AUTO)
+	protected Long id;
+
+	@javax.persistence.Version
+	protected Long version;
+
+	@Column(nullable = false, unique = true, length = 5)
+	protected String code;
+	
+	@Basic
+	protected Double marketValue;
+	
+	@Transient
+	protected Date lastUpdate;
+
+	/**
+	 * @return the id
+	 */
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the version
+	 */
+	public Long getVersion() {
+		return version;
+	}
+
+	/**
+	 * @param version the version to set
+	 */
+	public void setVersion(Long version) {
+		this.version = version;
+	}
+
+	/**
+	 * @return the code
+	 */
+	public String getCode() {
+		return code;
+	}
+
+	/**
+	 * @param code the code to set
+	 */
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	/**
+	 * @return the marketValue
+	 */
+	public Double getMarketValue() {
+		return marketValue;
+	}
+
+	/**
+	 * @param marketValue the marketValue to set
+	 */
+	public void setMarketValue(Double marketValue) {
+		this.marketValue = marketValue;
+	}
+
+	/**
+	 * @return the lastUpdate
+	 */
+	public Date getLastUpdate() {
+		return lastUpdate;
+	}
+
+	/**
+	 * @param lastUpdate the lastUpdate to set
+	 */
+	public void setLastUpdate(Date lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
+
+	/**
+	 * @see java.lang.Object#equals(Object)
+	 */
+	@Override
+	public boolean equals(Object other) {
+		boolean equals = false;
+		if (other instanceof Stock) {
+			Stock castOther = (Stock) other;
+			equals = new EqualsBuilder()
+				.append(this.getId(), castOther.getId())
+				.append(this.getCode(), castOther.getCode())
+				.isEquals();
+		}
+		return equals;
+	}
+
+	/**
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder()
+			.append(getId())
+			.append(getCode())
+			.toHashCode();
+	}
+	
+}

@@ -1,0 +1,81 @@
+Entity model
+
+	The {{{http://java.sun.com/javaee/5/docs/tutorial/doc/bnbpz.html} Java Persistence API (JPA)}} is a Java programming 
+	language framework that allows developers to manage relational data in Java Enterprise Platform. The persistence 
+	consists of three areas: the API (defined in the javax.persistence package), the query language and the object/relational 
+	metadata. The JPA intends to be replace the persistence solution of EJB 2.0 CMP, however you do not need an EJB container 
+	or a Java EE application server in order to run applications that use persistence.
+
+	A persistence entity is a lightweight Java class that typically represents a table in a relational database. Entity 
+	instances correspond to individual rows in the table. Entities typically have relationships with other entities, and 
+	these relationships are expressed through object/relational metadata. O/R-M can be specified directly in the entity 
+	class file by using annotations, or in a separate XML descriptor file distributed with the application.
+	
+	Defining an {{{http://java.sun.com/javaee/5/docs/tutorial/doc/bnbqa.html}JPA entity}} is just a matter of adding 
+	special annotations in your domain object. The example below shows how to create an user entity representing USER
+	table in the database:
+	
++---
+@Entity
+@Table(name = "USER")
+public class User implements Serializable {
++---
+
+JPQL
+
+	The {{{http://java.sun.com/javaee/5/docs/tutorial/doc/bnbtg.html}Java Persistence Query Language (JPQL)}} is used to 
+	make queries against entities stored in a relational database. Queries resemble SQL queries in syntax, but operate 
+	against entity objects rather than directly with database tables. Hereafter you can find some examples of queries:
+
++---
+@NamedQueries(value = {
+	@NamedQuery(name = "getUserByEmail", 
+		query = "select u from User u left join fetch u.groups g where u.email=:email"),
+	@NamedQuery(name = "getUserById", 
+		query = "select u from User u left join fetch u.groups g where u.id=:id"),
+	@NamedQuery(name = "getUserByUsername", 
+		query = "select u from User u where u.username=:username"),
+	@NamedQuery(name = "listUsers", 
+		query = "select u from User u order by u.name"),
+	@NamedQuery(name = "listUsersByRole", 
+		query = "select u from User u where u.role=:role order by u.name")
+})
++---
+
+Persistent fields
+
+	Finally the {{{http://java.sun.com/javaee/5/docs/tutorial/doc/bnbqa.html#bnbqc}persistence fields}} are decorated with 
+	JPA annotations depending on its individual characteristics. Relationships are also mapped regarding their nature, so 
+	they can be either one-to-one, one-to-many or many-to-many. Take a look at the following snippet:
+
++---
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+
+	@Column(unique = true, nullable = false, length = 30)
+	private String username;
+
+	@Column(nullable = false, length = 100)
+	private String password;
+
+	@Column(nullable = false, length = 50)
+	private String name;
+
+	@Column(unique = true, nullable = false, length = 50)
+	private String email;
+
+	@Basic(optional = false)
+	@Enumerated(EnumType.STRING)
+	private Role role;
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	private Set<Group> groups;
+
+	@Version
+	private Long version;
++---
+
+	For further details take a look at this {{{http://java.sun.com/developer/technicalArticles/J2EE/jpa}technical article}}
+	and check this {{{http://www.oracle.com/technology/products/ias/toplink/jpa/resources/toplink-jpa-annotations.html}reference
+	guide}}.

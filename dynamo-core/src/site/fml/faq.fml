@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<faqs title="Dynamo FAQ">
+
+	<part id="about">
+
+		<faq id="help">
+			<question>Where can I get help?</question>
+			<answer>
+				<p>The best place to find help is the mailing list.</p>
+			</answer>
+		</faq>
+
+	</part>
+
+</faqs> 
